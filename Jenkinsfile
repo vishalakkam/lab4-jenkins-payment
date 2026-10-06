@@ -1,7 +1,8 @@
+
 pipeline {
     agent any
 
-     tools {
+    tools {
         maven 'maven3916'
     }
 
@@ -33,31 +34,22 @@ pipeline {
         }
 
         stage('Approval') {
-    when {
-        expression {
-            env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
+            when {
+                expression {
+                    env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
+                }
+            }
+            steps {
+                input message: 'Approve production deployment?',
+                      ok: 'Deploy'
+            }
         }
-    }
-    steps {
-        input message: 'Approve production deployment?',
-              ok: 'Deploy'
-    }
-}
-
-stage('Deploy') {
-    when {
-        expression {
-            env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
-        }
-    }
-    steps {
-        echo 'Deploying target/payment-2.7.jar'
-    }
-}
 
         stage('Deploy') {
             when {
-                branch 'main'
+                expression {
+                    env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
+                }
             }
             steps {
                 echo 'Deploying target/payment-2.7.jar'
@@ -85,3 +77,4 @@ stage('Deploy') {
         }
     }
 }
+
